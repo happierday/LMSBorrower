@@ -92,7 +92,7 @@ public class BorrowerService {
 	public ResponseEntity<Object> checkOutBook(@PathVariable(value="cardNo") Integer cardNo,
 			@RequestBody Loan loan) {
 		try {
-			ldao.updateLoan("update tbl_boo_loans set dateIn = ? where bookId = ? and branchId = ? and cardNo = ?", 
+			ldao.updateLoan("update tbl_book_loans set dateIn = ? where bookId = ? and branchId = ? and cardNo = ?", 
 					new Object[] {loan.getDateIn(),loan.getBookId(),loan.getBranchId(),loan.getCardNo()});
 			HttpHeaders headers = new HttpHeaders();
 			headers.setLocation(URI.create("/borrowers/"+cardNo));
