@@ -33,8 +33,6 @@ import com.gcit.library.model.Loan;
 @CrossOrigin(origins="http://localhost:3000")
 public class BorrowerService {
 	
-	private String url = "http://localhost:8080";
-	
 	@Autowired
 	BorrowerDao bodao;
 	
@@ -42,7 +40,7 @@ public class BorrowerService {
 	LoanDao ldao;
 	
 	@Transactional
-	@RequestMapping(value="/validateCardNo/{cardNo}", method=RequestMethod.GET,produces="application/json")
+	@RequestMapping(value="/validateCardNo/{cardNo}", method=RequestMethod.GET)
 	public ResponseEntity<Object> validateCardNo(@PathVariable(value="cardNo") Integer cardNo) {
 		try {
 			List<Borrower> borrowers = bodao.getBorrowerByPK("select * from tbl_borrower where cardNo = ?", new Object[] {cardNo});
@@ -58,7 +56,7 @@ public class BorrowerService {
 	}
 	
 	@Transactional
-	@RequestMapping(value="/borrowers/{cardNo}", method=RequestMethod.GET,produces="application/json")
+	@RequestMapping(value="/borrowers/{cardNo}", method=RequestMethod.GET)
 	public ResponseEntity<Object> getBorrowHistory(@PathVariable(value="cardNo") Integer cardNo) {
 		try {
 			List<Loan> loans = ldao.getLoans("select book.bookId, branch.branchId, borrower.cardNo,book.title, borrower.name,branch.branchName,loan.dateOut,loan.dueDate,loan.dateIn from tbl_book book\n" + 
@@ -74,12 +72,12 @@ public class BorrowerService {
 	}
 	
 	@Transactional
-	@RequestMapping(value="/borrowers/{cardNo}", method=RequestMethod.PUT,consumes="application/json",produces="application/json")
+	@RequestMapping(value="/borrowers/{cardNo}", method=RequestMethod.PUT)
 	public ResponseEntity<Object> returnBook(@PathVariable(value="cardNo") Integer cardNo,
 			@RequestBody Loan loan) {
 		try {
 			HttpHeaders headers = new HttpHeaders();
-			headers.setLocation(URI.create(url+"/borrowers/"+cardNo));
+			headers.setLocation(URI.create("/borrowers/"+cardNo));
 			ldao.updateLoan("update tbl_book_loans set dateIn = ? where bookId = ? and branchId = ? and cardNo = ?", 
 					new Object[] {loan.getDateIn(),loan.getBookId(),loan.getBranchId(),loan.getCardNo()});
 			return new ResponseEntity<Object>(headers,HttpStatus.OK);
@@ -90,14 +88,14 @@ public class BorrowerService {
 	}
 	
 	@Transactional
-	@RequestMapping(value="/borrowers/{cardNo}", method=RequestMethod.POST,consumes="application/json",produces="application/json")
+	@RequestMapping(value="/borrowers/{cardNo}", method=RequestMethod.POST)
 	public ResponseEntity<Object> checkOutBook(@PathVariable(value="cardNo") Integer cardNo,
 			@RequestBody Loan loan) {
 		try {
 			ldao.updateLoan("update tbl_boo_loans set dateIn = ? where bookId = ? and branchId = ? and cardNo = ?", 
 					new Object[] {loan.getDateIn(),loan.getBookId(),loan.getBranchId(),loan.getCardNo()});
 			HttpHeaders headers = new HttpHeaders();
-			headers.setLocation(URI.create(url+"/borrowers/"+cardNo));
+			headers.setLocation(URI.create("/borrowers/"+cardNo));
 			return new ResponseEntity<Object>(headers,HttpStatus.OK);
 		} catch (Exception e) {
 			e.printStackTrace();
